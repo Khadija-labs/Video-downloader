@@ -1,0 +1,14 @@
+packages:
+  "framer-motion": "For smooth page transitions, staggered reveals, and sleek glassmorphism animations."
+  "clsx": "Utility for conditionally joining classNames."
+  "tailwind-merge": "Utility to merge tailwind classes without style conflicts."
+
+images:
+  - path: "artifacts/video-downloader/public/images/hero-bg.png"
+    description: "Abstract 3D neon gradient mesh in dark violet and cyan colors against a deep black background, very subtle and sleek, professional modern tech aesthetic"
+    aspect_ratio: "16:9"
+
+notes:
+  - Using generated Orval hooks from @workspace/api-client-react for API calls.
+  - Dark mode is enforced as the default theme.
+  - Video downloads are triggered via browser anchor tag navigation to the provided direct URLs.

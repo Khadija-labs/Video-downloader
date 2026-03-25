@@ -1,15 +1,16 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Video Downloader API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: video
+    description: Video download operations
 paths:
   /healthz:
     get:
@@ -24,6 +25,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /video/info:
+    post:
+      operationId: getVideoInfo
+      tags: [video]
+      summary: Get video information
+      description: Fetch video metadata and download links from a social media URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VideoInfoRequest"
+      responses:
+        "200":
+          description: Video information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VideoInfoResponse"
+        "400":
+          description: Invalid URL or unsupported platform
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error while processing video
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +65,70 @@ components:
           type: string
       required:
         - status
-
+    VideoInfoRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Social media video URL to process
+      required:
+        - url
+    VideoQuality:
+      type: object
+      properties:
+        quality:
+          type: string
+          description: Quality label (e.g. "HD 720p", "SD 480p", "Audio Only")
+        format:
+          type: string
+          description: File format (e.g. "mp4", "mp3")
+        url:
+          type: string
+          description: Direct download URL
+        size:
+          type: string
+          description: Approximate file size
+      required:
+        - quality
+        - format
+        - url
+    VideoInfoResponse:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Video title
+        thumbnail:
+          type: string
+          description: Thumbnail image URL
+        platform:
+          type: string
+          description: Social media platform (instagram, facebook, tiktok, youtube)
+        duration:
+          type: string
+          description: Video duration (formatted as MM:SS)
+        author:
+          type: string
+          description: Content creator or channel name
+        downloads:
+          type: array
+          items:
+            $ref: "#/components/schemas/VideoQuality"
+      required:
+        - title
+        - thumbnail
+        - platform
+        - duration
+        - author
+        - downloads
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+      required:
+        - error
