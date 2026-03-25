@@ -6,27 +6,26 @@ export function useDownload() {
 
   const downloadFile = useCallback((url: string, filename: string) => {
     try {
-      // In a real scenario with direct URLs, creating an anchor tag and clicking it
-      // triggers the browser's download manager if the server sends Content-Disposition: attachment
-      // or if we use the 'download' attribute.
+      // All download URLs now route through our /api/video/download proxy,
+      // which serves Content-Disposition: attachment — so the anchor download
+      // attribute reliably triggers a save dialog without navigating away.
       const a = document.createElement("a");
       a.href = url;
       a.download = filename;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
+      // Do NOT set target="_blank" — it overrides the download attribute for cross-origin URLs
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      
+
       toast({
         title: "Download started",
-        description: "Your file is downloading.",
+        description: `Saving ${filename}…`,
       });
     } catch (error) {
       toast({
         title: "Download failed",
         description: "Could not initiate the download. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   }, [toast]);
