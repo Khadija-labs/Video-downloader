@@ -1,45 +1,24 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLocation } from "wouter";
-import { Trash2, Download, ExternalLink, History as HistoryIcon, ArrowLeft, Film, Clock, Search } from "lucide-react";
-
-export interface HistoryEntry {
-  id: string;
-  url: string;
-  title: string;
-  thumbnail: string;
-  platform: string;
-  author: string;
-  duration: string;
-  downloadedAt: string;
-  downloadedQuality?: string;
-}
-
-const HISTORY_KEY = "vidsave_download_history";
-
-export function getHistory(): HistoryEntry[] {
-  try {
-    return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-export function addToHistory(entry: Omit<HistoryEntry, "id" | "downloadedAt">) {
-  const history = getHistory();
-  const newEntry: HistoryEntry = {
-    ...entry,
-    id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-    downloadedAt: new Date().toISOString(),
-  };
-  const updated = [newEntry, ...history].slice(0, 50);
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-  return newEntry;
-}
-
-export function clearHistory() {
-  localStorage.removeItem(HISTORY_KEY);
-}
+import { useRouter } from "next/navigation";
+import {
+  Trash2,
+  Download,
+  ExternalLink,
+  History as HistoryIcon,
+  ArrowLeft,
+  Film,
+  Clock,
+  Search,
+} from "lucide-react";
+import {
+  type HistoryEntry,
+  getHistory,
+  clearHistory,
+  removeHistoryById,
+} from "@/lib/history-store";
 
 const PLATFORM_COLORS: Record<string, string> = {
   instagram: "from-yellow-500 via-pink-500 to-purple-500",
@@ -72,8 +51,8 @@ function formatDate(iso: string) {
   return d.toLocaleDateString();
 }
 
-export default function History() {
-  const [, navigate] = useLocation();
+export default function HistoryPage() {
+  const router = useRouter();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [search, setSearch] = useState("");
   const [confirmClear, setConfirmClear] = useState(false);
@@ -101,23 +80,20 @@ export default function History() {
   };
 
   const handleRemove = (id: string) => {
-    const updated = history.filter((e) => e.id !== id);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-    setHistory(updated);
+    setHistory(removeHistoryById(id));
   };
 
   const handleReDownload = (entry: HistoryEntry) => {
-    navigate(`/?url=${encodeURIComponent(entry.url)}`);
+    router.push(`/?url=${encodeURIComponent(entry.url)}`);
   };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Sticky Header */}
       <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-background/60 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate("/")}
+              onClick={() => router.push("/")}
               className="flex items-center gap-1.5 text-muted-foreground dark:text-foreground/85 hover:text-foreground transition-colors text-sm"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -179,7 +155,7 @@ export default function History() {
               Your download history will appear here once you start saving videos.
             </p>
             <button
-              onClick={() => navigate("/")}
+              onClick={() => router.push("/")}
               className="mt-8 px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 transition"
             >
               Start downloading
@@ -192,7 +168,9 @@ export default function History() {
             className="text-center py-20 text-muted-foreground dark:text-foreground/85"
           >
             <Search className="w-10 h-10 mx-auto mb-4 opacity-30" />
-            <p>No results for "<span className="text-foreground/90">{search}</span>"</p>
+            <p>
+              No results for "<span className="text-foreground/90">{search}</span>"
+            </p>
           </motion.div>
         ) : (
           <AnimatePresence>
@@ -206,12 +184,10 @@ export default function History() {
                   transition={{ delay: i * 0.04 }}
                   className="group relative flex gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] hover:border-white/10 transition-all duration-200"
                 >
-                  {/* Platform glow */}
                   <div
                     className={`absolute -top-20 -left-20 w-40 h-40 opacity-0 group-hover:opacity-10 blur-3xl rounded-full transition-opacity duration-500 bg-gradient-to-br ${PLATFORM_COLORS[entry.platform] || "from-primary to-accent"}`}
                   />
 
-                  {/* Thumbnail */}
                   <div className="relative shrink-0 w-24 h-16 sm:w-32 sm:h-20 rounded-xl overflow-hidden bg-white/5">
                     <img
                       src={entry.thumbnail}
@@ -233,13 +209,14 @@ export default function History() {
                     </span>
                   </div>
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0 flex flex-col justify-between">
                     <div>
                       <h3 className="font-semibold text-foreground text-sm leading-snug line-clamp-2 mb-1">
                         {entry.title}
                       </h3>
-                      <p className="text-xs text-muted-foreground dark:text-foreground/80 truncate">{entry.author}</p>
+                      <p className="text-xs text-muted-foreground dark:text-foreground/80 truncate">
+                        {entry.author}
+                      </p>
                     </div>
                     <div className="flex items-center gap-3 mt-2">
                       <span className="text-[11px] text-muted-foreground/80 flex items-center gap-1">
@@ -254,7 +231,6 @@ export default function History() {
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex flex-col gap-2 shrink-0 justify-center">
                     <button
                       onClick={() => handleReDownload(entry)}

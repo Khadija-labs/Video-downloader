@@ -76,6 +76,9 @@
   --border: 268 58% 76%;
   --input: 268 58% 76%;
   --ring: 268 86% 66%;
+  --chrome-bg: 258 28% 26%;
+  --chrome-border: 266 32% 62%;
+  --chrome-text: 0 0% 100%;
 
   --radius: 0.75rem;
 }
@@ -111,6 +114,103 @@
   --border: 239 18% 20%;
   --input: 239 18% 18%;
   --ring: 266 90% 68%;
+  --chrome-bg: 238 26% 14%;
+  --chrome-border: 238 22% 30%;
+  --chrome-text: 0 0% 96%;
+}
+
+/* Preset themes (persisted via data-theme-preset on <html>) */
+html[data-theme-preset="ocean"]:not(.dark) {
+  --background: 198 72% 92%;
+  --foreground: 206 70% 16%;
+  --primary: 201 94% 48%;
+  --secondary: 195 75% 84%;
+  --muted: 199 62% 80%;
+  --muted-foreground: 202 30% 30%;
+  --accent: 183 85% 42%;
+  --border: 199 58% 72%;
+  --input: 199 58% 72%;
+  --ring: 201 94% 48%;
+  --chrome-bg: 204 54% 25%;
+  --chrome-border: 199 58% 64%;
+  --chrome-text: 196 100% 96%;
+}
+
+html.dark[data-theme-preset="ocean"] {
+  --background: 207 55% 8%;
+  --foreground: 198 100% 96%;
+  --primary: 196 92% 58%;
+  --secondary: 204 42% 16%;
+  --muted: 204 42% 16%;
+  --muted-foreground: 200 35% 80%;
+  --accent: 183 85% 52%;
+  --border: 204 35% 24%;
+  --input: 204 35% 22%;
+  --ring: 196 92% 58%;
+  --chrome-bg: 206 52% 16%;
+  --chrome-border: 204 35% 30%;
+  --chrome-text: 198 100% 96%;
+}
+
+html[data-theme-preset="neon"]:not(.dark) {
+  --background: 296 64% 93%;
+  --foreground: 284 48% 14%;
+  --primary: 294 86% 52%;
+  --secondary: 286 58% 84%;
+  --muted: 288 54% 79%;
+  --muted-foreground: 286 30% 30%;
+  --accent: 178 88% 40%;
+  --border: 286 48% 72%;
+  --input: 286 48% 72%;
+  --ring: 294 86% 52%;
+  --chrome-bg: 286 42% 24%;
+  --chrome-border: 286 44% 60%;
+  --chrome-text: 0 0% 100%;
+}
+
+html.dark[data-theme-preset="neon"] {
+  --background: 286 44% 7%;
+  --foreground: 0 0% 100%;
+  --primary: 294 90% 60%;
+  --secondary: 284 34% 16%;
+  --muted: 284 34% 16%;
+  --muted-foreground: 282 30% 82%;
+  --accent: 178 88% 46%;
+  --border: 284 32% 24%;
+  --input: 284 32% 22%;
+  --ring: 294 90% 60%;
+  --chrome-bg: 286 38% 14%;
+  --chrome-border: 284 32% 30%;
+  --chrome-text: 0 0% 100%;
+}
+
+html[data-theme-preset="accent"]:not(.dark),
+html.dark[data-theme-preset="accent"] {
+  /* Accent theme requested: #1E1E2F bg, #FF6B6B highlights, white text */
+  --background: 240 22% 15%;
+  --foreground: 0 0% 100%;
+  --card: 240 22% 18%;
+  --card-foreground: 0 0% 100%;
+  --card-border: 240 18% 28%;
+  --popover: 240 22% 18%;
+  --popover-foreground: 0 0% 100%;
+  --popover-border: 240 18% 28%;
+  --primary: 0 100% 71%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 18% 24%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 240 18% 24%;
+  --muted-foreground: 0 0% 86%;
+  --accent: 0 100% 71%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 72% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 240 18% 28%;
+  --input: 240 18% 26%;
+  --ring: 0 100% 71%;
+  --chrome-bg: 240 24% 20%;
+  --chrome-border: 240 18% 36%;
+  --chrome-text: 0 0% 100%;
 }
 
 @layer base {

@@ -1,7 +1,9 @@
-import { Link } from "wouter";
+"use client";
+
+import Link from "next/link";
 import { ArrowLeft, AlertTriangle } from "lucide-react";
 
-export default function NotFound() {
+export default function NotFoundPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="glass-card max-w-md w-full p-8 rounded-3xl text-center flex flex-col items-center">
@@ -12,8 +14,8 @@ export default function NotFound() {
         <p className="text-lg text-muted-foreground mb-8">
           Oops! The page you're looking for doesn't exist or has been moved.
         </p>
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
         >
           <ArrowLeft className="w-4 h-4" />

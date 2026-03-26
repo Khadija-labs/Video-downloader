@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Download, Clock, User, Film, Music, AlertCircle } from "lucide-react";
 import type { VideoInfoResponse } from "@workspace/api-client-react";
 import { useDownload } from "@/hooks/use-download";
-import { addToHistory } from "@/pages/history";
+import { addToHistory } from "@/lib/history-store";
 import { cn } from "@/lib/utils";
 
 interface VideoResultProps {
