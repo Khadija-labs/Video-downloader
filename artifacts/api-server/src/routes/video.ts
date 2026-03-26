@@ -9,7 +9,10 @@ import os from "node:os";
 
 const execFileAsync = promisify(execFile);
 const router: IRouter = Router();
-const YT_DLP = "yt-dlp";
+const YT_DLP =
+  process.env["YT_DLP_PATH"]?.trim() ||
+  process.env["YT_DLP"]?.trim() ||
+  "yt-dlp";
 
 // Temp dir for downloads
 const DOWNLOAD_DIR = path.join(os.tmpdir(), "vidsave-downloads");

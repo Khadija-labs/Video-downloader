@@ -46,41 +46,71 @@
 }
 
 :root {
-  /* Enforcing Dark Mode as the primary sleek aesthetic */
-  --background: 240 10% 4%;
-  --foreground: 0 0% 98%;
-  
-  --card: 240 10% 6%;
-  --card-foreground: 0 0% 98%;
-  --card-border: 240 10% 12%;
-  
-  --popover: 240 10% 6%;
-  --popover-foreground: 0 0% 98%;
-  --popover-border: 240 10% 12%;
-  
-  /* Primary - Neon Violet */
-  --primary: 262 83% 65%;
+  /* LIGHT THEME - soft light purple */
+  --background: 270 70% 88%;
+  --foreground: 248 38% 18%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 248 38% 18%;
+  --card-border: 268 58% 76%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 248 38% 18%;
+  --popover-border: 268 58% 76%;
+
+  --primary: 270 84% 60%;
   --primary-foreground: 0 0% 100%;
-  
-  /* Secondary - Deep Gray */
-  --secondary: 240 10% 12%;
-  --secondary-foreground: 0 0% 98%;
-  
-  --muted: 240 10% 12%;
-  --muted-foreground: 240 5% 65%;
-  
-  /* Accent - Cyan/Blue */
-  --accent: 190 90% 60%;
-  --accent-foreground: 0 0% 98%;
-  
+
+  --secondary: 268 70% 82%;
+  --secondary-foreground: 248 38% 18%;
+
+  --muted: 266 52% 78%;
+  --muted-foreground: 252 25% 30%;
+
+  --accent: 194 89% 45%;
+  --accent-foreground: 194 100% 14%;
+
   --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 98%;
-  
-  --border: 240 10% 15%;
-  --input: 240 10% 10%;
-  --ring: 262 83% 65%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 268 58% 76%;
+  --input: 268 58% 76%;
+  --ring: 268 86% 66%;
 
   --radius: 0.75rem;
+}
+
+.dark {
+  /* DARK THEME - neon night */
+  --background: 236 26% 7%;
+  --foreground: 0 0% 100%;
+
+  --card: 238 24% 10%;
+  --card-foreground: 0 0% 98%;
+  --card-border: 239 18% 18%;
+
+  --popover: 238 24% 10%;
+  --popover-foreground: 0 0% 98%;
+  --popover-border: 239 18% 18%;
+
+  --primary: 268 88% 69%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 238 20% 14%;
+  --secondary-foreground: 0 0% 98%;
+
+  --muted: 238 20% 14%;
+  --muted-foreground: 230 22% 82%;
+
+  --accent: 198 96% 60%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 72% 45%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 239 18% 20%;
+  --input: 239 18% 18%;
+  --ring: 266 90% 68%;
 }
 
 @layer base {
@@ -90,6 +120,10 @@
 
   html {
     @apply antialiased bg-background text-foreground scroll-smooth;
+    color-scheme: light;
+  }
+
+  html.dark {
     color-scheme: dark;
   }
   

@@ -55,7 +55,7 @@ export function VideoResult({ data, sourceUrl }: VideoResultProps) {
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-full max-w-4xl mx-auto rounded-3xl overflow-hidden mt-12 relative bg-white/[0.04] border border-white/10 shadow-2xl"
+      className="w-full max-w-4xl mx-auto rounded-3xl overflow-hidden mt-12 relative bg-white/75 dark:bg-white/[0.05] border border-primary/20 dark:border-white/10 shadow-2xl"
     >
       {/* Platform glow */}
       <div className={cn(
@@ -97,16 +97,16 @@ export function VideoResult({ data, sourceUrl }: VideoResultProps) {
             <h2 className="text-2xl md:text-3xl font-bold text-foreground leading-tight line-clamp-2 mb-3">
               {data.title}
             </h2>
-            <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="flex items-center gap-2 text-muted-foreground dark:text-foreground/85">
               <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full text-sm">
                 <User className="w-4 h-4 text-primary" />
-                <span className="font-medium text-foreground/80">{data.author}</span>
+                <span className="font-medium text-foreground/90">{data.author}</span>
               </div>
             </div>
           </div>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground dark:text-foreground/80 mb-4">
               Download Options
             </h3>
 
@@ -119,7 +119,7 @@ export function VideoResult({ data, sourceUrl }: VideoResultProps) {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.08 }}
                     onClick={() => handleDownload(dl.url, dl.quality, dl.format)}
-                    className="group relative flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/50 transition-all duration-200 text-left overflow-hidden"
+                    className="group relative flex items-center justify-between p-4 rounded-xl bg-white/70 dark:bg-white/5 border border-primary/20 dark:border-white/10 hover:bg-white/90 dark:hover:bg-white/10 hover:border-primary/50 transition-all duration-200 text-left overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                     <div className="flex items-center gap-3 relative z-10">
@@ -128,7 +128,7 @@ export function VideoResult({ data, sourceUrl }: VideoResultProps) {
                       </div>
                       <div>
                         <div className="font-bold text-foreground text-sm">{dl.quality}</div>
-                        <div className="text-xs text-muted-foreground uppercase flex items-center gap-2">
+                        <div className="text-xs text-muted-foreground dark:text-foreground/80 uppercase flex items-center gap-2">
                           <span>{dl.format}</span>
                           {dl.size && (
                             <>
@@ -139,7 +139,7 @@ export function VideoResult({ data, sourceUrl }: VideoResultProps) {
                         </div>
                       </div>
                     </div>
-                    <Download className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:-translate-y-0.5 transition-all duration-200 relative z-10 shrink-0" />
+                    <Download className="w-5 h-5 text-muted-foreground dark:text-foreground/80 group-hover:text-primary group-hover:-translate-y-0.5 transition-all duration-200 relative z-10 shrink-0" />
                   </motion.button>
                 ))}
               </div>

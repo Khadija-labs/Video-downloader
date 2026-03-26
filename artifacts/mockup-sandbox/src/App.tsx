@@ -1,8 +1,24 @@
 import { useEffect, useState, type ComponentType } from "react";
+import { Moon, Sun } from "lucide-react";
 
 import { modules as discoveredModules } from "./.generated/mockup-components";
 
 type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
+
+type ThemeMode = "light" | "dark";
+
+const THEME_STORAGE_KEY = "mockup_sandbox_theme";
+
+function getInitialThemeMode(): ThemeMode {
+  if (typeof window === "undefined") return "light";
+
+  const saved = localStorage.getItem(THEME_STORAGE_KEY);
+  if (saved === "light" || saved === "dark") return saved;
+
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
 
 function _resolveComponent(
   mod: Record<string, unknown>,
@@ -98,17 +114,17 @@ function getPreviewExamplePath(): string {
 
 function Gallery() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
+    <div className="min-h-screen bg-background flex items-center justify-center p-8 text-foreground">
       <div className="text-center max-w-md">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-3">
+        <h1 className="text-2xl font-semibold mb-3">
           Component Preview Server
         </h1>
-        <p className="text-gray-500 mb-4">
+        <p className="text-muted-foreground mb-4">
           This server renders individual components for the workspace canvas.
         </p>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-muted-foreground/60">
           Access component previews at{" "}
-          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+          <code className="bg-card px-1.5 py-0.5 rounded text-foreground/70">
             {getPreviewExamplePath()}
           </code>
         </p>
@@ -129,18 +145,60 @@ function getPreviewPath(): string | null {
 }
 
 function App() {
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() =>
+    getInitialThemeMode(),
+  );
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", themeMode === "dark");
+    localStorage.setItem(THEME_STORAGE_KEY, themeMode);
+  }, [themeMode]);
+
   const previewPath = getPreviewPath();
+
+  const toggleTheme = () => {
+    setThemeMode((t) => (t === "dark" ? "light" : "dark"));
+  };
 
   if (previewPath) {
     return (
-      <PreviewRenderer
-        componentPath={previewPath}
-        modules={discoveredModules}
-      />
+      <div>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+          className="fixed top-4 right-4 z-50 inline-flex items-center justify-center w-10 h-10 rounded-xl border border-border/30 bg-background/70 backdrop-blur-md shadow-sm hover:bg-background transition-colors"
+        >
+          {themeMode === "dark" ? (
+            <Sun className="w-4 h-4 text-foreground" />
+          ) : (
+            <Moon className="w-4 h-4 text-foreground" />
+          )}
+        </button>
+
+        <PreviewRenderer componentPath={previewPath} modules={discoveredModules} />
+      </div>
     );
   }
 
-  return <Gallery />;
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={toggleTheme}
+        aria-label="Toggle theme"
+        className="fixed top-4 right-4 z-50 inline-flex items-center justify-center w-10 h-10 rounded-xl border border-border/30 bg-background/70 backdrop-blur-md shadow-sm hover:bg-background transition-colors"
+      >
+        {themeMode === "dark" ? (
+          <Sun className="w-4 h-4 text-foreground" />
+        ) : (
+          <Moon className="w-4 h-4 text-foreground" />
+        )}
+      </button>
+
+      <Gallery />
+    </div>
+  );
 }
 
 export default App;

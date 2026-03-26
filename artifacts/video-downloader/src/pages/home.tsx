@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import { Link2, Loader2, ArrowRight, CheckCircle2, Play, LayoutGrid, History } from "lucide-react";
+import { FaInstagram, FaTiktok, FaFacebookF, FaYoutube } from "react-icons/fa";
 import { useGetVideoInfo } from "@workspace/api-client-react";
 import { VideoResult } from "@/components/video-result";
 import { AdsSlot } from "@/components/ads-slot";
 import { useToast } from "@/components/ui/use-toast";
-import { addToHistory } from "@/pages/history";
 
 const PLATFORMS = [
-  { name: "Instagram", icon: "📸" },
-  { name: "TikTok", icon: "🎵" },
-  { name: "Facebook", icon: "👥" },
-  { name: "YouTube", icon: "▶️" },
+  { name: "Instagram", icon: FaInstagram, className: "text-pink-500" },
+  { name: "TikTok", icon: FaTiktok, className: "text-foreground" },
+  { name: "Facebook", icon: FaFacebookF, className: "text-blue-500" },
+  { name: "YouTube", icon: FaYoutube, className: "text-red-500" },
 ];
 
 const FEATURES = [
@@ -26,6 +26,13 @@ export default function Home() {
   const [url, setUrl] = useState("");
   const { toast } = useToast();
 
+  const scrollToResults = () => {
+    const results = document.getElementById("results");
+    if (!results) return;
+
+    results.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   // Pre-fill URL from query param (used by History page "re-download" button)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -35,16 +42,9 @@ export default function Home() {
 
   const { mutate: fetchVideo, isPending, data: result, error } = useGetVideoInfo({
     mutation: {
-      onSuccess: (data, variables) => {
-        // Save to history
-        addToHistory({
-          url: variables.data.url,
-          title: data.title,
-          thumbnail: data.thumbnail,
-          platform: data.platform,
-          author: data.author,
-          duration: data.duration,
-        });
+      onSuccess: () => {
+        // Ensure user lands on the generated download result.
+        requestAnimationFrame(() => scrollToResults());
       },
       onError: (err: any) => {
         toast({
@@ -65,6 +65,7 @@ export default function Home() {
       toast({ title: "Invalid URL", description: "Please enter a valid http/https URL.", variant: "destructive" });
       return;
     }
+    scrollToResults();
     fetchVideo({ data: { url } });
   };
 
@@ -86,7 +87,7 @@ export default function Home() {
           alt=""
           className="w-full h-full object-cover opacity-30"
         />
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-[100px] mix-blend-multiply" />
+        <div className="absolute inset-0 bg-background/70 dark:bg-background/55 backdrop-blur-[100px] mix-blend-multiply dark:mix-blend-normal" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/90 to-background" />
       </div>
 
@@ -104,7 +105,7 @@ export default function Home() {
             </div>
             <button
               onClick={() => navigate("/history")}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-muted-foreground dark:text-foreground/85 hover:text-foreground hover:bg-white/10 transition-all"
             >
               <History className="w-4 h-4" />
               History
@@ -122,15 +123,15 @@ export default function Home() {
           >
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-sm">
               <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-medium tracking-wide text-foreground/80">100% Free & Unlimited Downloads</span>
+              <span className="text-xs font-medium tracking-wide text-foreground/90">100% Free & Unlimited Downloads</span>
             </div>
 
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-6">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-6 text-foreground dark:text-white">
               Download Social Videos <br className="hidden sm:block" />
               <span className="text-gradient">In Seconds.</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+            <p className="text-lg md:text-xl text-muted-foreground dark:text-foreground/85 max-w-2xl mx-auto mb-10">
               Save high-quality videos from Instagram, TikTok, Facebook, and YouTube directly to your device without watermarks.
             </p>
 
@@ -139,19 +140,19 @@ export default function Home() {
               <div className="absolute -inset-1 bg-gradient-to-r from-primary via-fuchsia-500 to-accent rounded-2xl blur opacity-25 group-focus-within:opacity-50 transition duration-1000 group-hover:duration-200" />
               <div className="relative flex flex-col sm:flex-row items-center gap-2 p-2 bg-background/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
                 <div className="relative flex-1 flex items-center w-full">
-                  <Link2 className="absolute left-4 w-5 h-5 text-muted-foreground" />
+                  <Link2 className="absolute left-4 w-5 h-5 text-muted-foreground dark:text-foreground/80" />
                   <input
                     type="url"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     placeholder="Paste video URL here..."
-                    className="w-full h-14 pl-12 pr-20 bg-transparent border-none focus:outline-none text-foreground text-lg placeholder:text-muted-foreground/60"
+                    className="w-full h-14 pl-12 pr-20 bg-transparent border-none focus:outline-none text-foreground text-lg placeholder:text-muted-foreground/80"
                     required
                   />
                   <button
                     type="button"
                     onClick={handlePaste}
-                    className="absolute right-3 px-3 py-1.5 text-xs font-medium text-muted-foreground bg-white/5 hover:bg-white/10 hover:text-foreground rounded-lg transition-colors"
+                    className="absolute right-3 px-3 py-1.5 text-xs font-medium text-muted-foreground dark:text-foreground/85 bg-white/5 hover:bg-white/10 hover:text-foreground rounded-lg transition-colors"
                   >
                     Paste
                   </button>
@@ -169,23 +170,25 @@ export default function Home() {
             {/* Platforms */}
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               {PLATFORMS.map((p) => (
-                <div key={p.name} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors cursor-default">
-                  <span className="text-lg">{p.icon}</span>
+                <div key={p.name} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-sm font-medium text-muted-foreground dark:text-foreground/85 hover:text-foreground hover:bg-white/10 transition-colors cursor-default">
+                  <p.icon className={`text-base ${p.className}`} />
                   {p.name}
                 </div>
               ))}
             </div>
           </motion.div>
 
-          {/* Ad slot - top */}
-          <div className="w-full max-w-4xl mx-auto mb-12">
-            <AdsSlot slotId="hero-ad-slot" format="horizontal" className="h-[90px]" />
-          </div>
+          {/* Ad slot - top (only before result appears) */}
+          {!result && (
+            <div className="w-full max-w-4xl mx-auto mb-12">
+              <AdsSlot slotId="hero-ad-slot" format="horizontal" className="h-[90px]" />
+            </div>
+          )}
 
           {/* Results area */}
           <div className="w-full flex flex-col items-center justify-start" id="results">
             {isPending && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-20 text-muted-foreground dark:text-foreground/85">
                 <div className="relative w-16 h-16 mb-6">
                   <div className="absolute inset-0 border-4 border-white/10 rounded-full" />
                   <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin" />
@@ -206,8 +209,12 @@ export default function Home() {
             {!isPending && !result && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="w-full max-w-4xl mt-20">
                 <div className="text-center mb-16">
-                  <h2 className="text-3xl font-bold mb-4">How It Works</h2>
-                  <p className="text-muted-foreground">Three simple steps to save your favorite content.</p>
+                  <h2 className="text-3xl font-bold mb-4 text-foreground dark:text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]">
+                    How It Works
+                  </h2>
+                  <p className="text-muted-foreground dark:text-white/90">
+                    Three simple steps to save your favorite content.
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
@@ -217,22 +224,28 @@ export default function Home() {
                     { step: "02", title: "Paste & Fetch", desc: "Paste the link in the input box above and hit download." },
                     { step: "03", title: "Save File", desc: "Choose your preferred quality and save directly to your device." },
                   ].map((item) => (
-                    <div key={item.step} className="relative z-10 bg-white/[0.03] border border-white/10 p-8 rounded-3xl text-center group hover:-translate-y-2 transition-transform duration-300">
+                    <div
+                      key={item.step}
+                      className="relative z-10 bg-white/70 dark:bg-white/[0.08] border border-primary/20 dark:border-white/25 shadow-[0_10px_30px_-18px_rgba(124,58,237,0.45)] p-8 rounded-3xl text-center group hover:-translate-y-2 transition-transform duration-300"
+                    >
                       <div className="w-14 h-14 mx-auto bg-background rounded-full border border-white/10 flex items-center justify-center font-bold text-xl text-primary mb-6 group-hover:scale-110 transition-transform">
                         {item.step}
                       </div>
-                      <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                      <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
+                      <h3 className="text-xl font-bold mb-3 text-foreground dark:text-white">{item.title}</h3>
+                      <p className="text-muted-foreground dark:text-white/90 text-sm leading-relaxed">{item.desc}</p>
                     </div>
                   ))}
                 </div>
 
                 <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-6">
                   {FEATURES.map((feature, idx) => (
-                    <div key={idx} className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col gap-4">
+                    <div
+                      key={idx}
+                      className="p-6 rounded-2xl bg-white/70 dark:bg-white/[0.07] border border-primary/20 dark:border-white/20 shadow-[0_10px_30px_-18px_rgba(56,189,248,0.45)] flex flex-col gap-4"
+                    >
                       <feature.icon className="w-8 h-8 text-accent" />
-                      <h4 className="font-bold text-lg">{feature.title}</h4>
-                      <p className="text-sm text-muted-foreground">{feature.desc}</p>
+                      <h4 className="font-bold text-lg text-foreground dark:text-white">{feature.title}</h4>
+                      <p className="text-sm text-muted-foreground dark:text-white/90">{feature.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -241,7 +254,7 @@ export default function Home() {
           </div>
         </main>
 
-        <footer className="w-full border-t border-white/5 py-8 text-center text-sm text-muted-foreground relative z-10">
+        <footer className="w-full border-t border-white/5 py-8 text-center text-sm text-muted-foreground dark:text-foreground/80 relative z-10">
           <p>© {new Date().getFullYear()} VidSave Downloader. All rights reserved.</p>
           <p className="mt-2 text-xs opacity-50">For personal use only. Please respect copyright laws.</p>
         </footer>

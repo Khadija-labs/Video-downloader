@@ -118,12 +118,12 @@ export default function History() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/")}
-              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors text-sm"
+              className="flex items-center gap-1.5 text-muted-foreground dark:text-foreground/85 hover:text-foreground transition-colors text-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
             </button>
-            <span className="text-white/20">|</span>
+            <span className="text-white/40">|</span>
             <div className="flex items-center gap-2">
               <HistoryIcon className="w-5 h-5 text-primary" />
               <span className="font-bold text-lg">Download History</span>
@@ -131,7 +131,7 @@ export default function History() {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs text-muted-foreground hidden sm:block">
+            <span className="text-xs text-muted-foreground dark:text-foreground/80 hidden sm:block">
               {history.length} {history.length === 1 ? "entry" : "entries"}
             </span>
             {history.length > 0 && (
@@ -140,7 +140,7 @@ export default function History() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   confirmClear
                     ? "bg-destructive/20 text-destructive border border-destructive/30"
-                    : "bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-foreground"
+                    : "bg-white/5 hover:bg-white/10 text-muted-foreground dark:text-foreground/85 hover:text-foreground"
                 }`}
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -154,13 +154,13 @@ export default function History() {
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {history.length > 0 && (
           <div className="relative mb-6">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground dark:text-foreground/70 pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search history…"
-              className="w-full h-11 pl-11 pr-4 bg-white/5 border border-white/10 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition"
+              className="w-full h-11 pl-11 pr-4 bg-white/5 border border-white/10 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/80 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition"
             />
           </div>
         )}
@@ -172,10 +172,10 @@ export default function History() {
             className="flex flex-col items-center justify-center py-32 text-center"
           >
             <div className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
-              <Film className="w-10 h-10 text-muted-foreground/40" />
+              <Film className="w-10 h-10 text-muted-foreground/70" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">No downloads yet</h2>
-            <p className="text-muted-foreground text-sm max-w-xs">
+            <p className="text-muted-foreground dark:text-foreground/85 text-sm max-w-xs">
               Your download history will appear here once you start saving videos.
             </p>
             <button
@@ -189,10 +189,10 @@ export default function History() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-20 text-muted-foreground"
+            className="text-center py-20 text-muted-foreground dark:text-foreground/85"
           >
             <Search className="w-10 h-10 mx-auto mb-4 opacity-30" />
-            <p>No results for "<span className="text-foreground/70">{search}</span>"</p>
+            <p>No results for "<span className="text-foreground/90">{search}</span>"</p>
           </motion.div>
         ) : (
           <AnimatePresence>
@@ -239,10 +239,10 @@ export default function History() {
                       <h3 className="font-semibold text-foreground text-sm leading-snug line-clamp-2 mb-1">
                         {entry.title}
                       </h3>
-                      <p className="text-xs text-muted-foreground truncate">{entry.author}</p>
+                      <p className="text-xs text-muted-foreground dark:text-foreground/80 truncate">{entry.author}</p>
                     </div>
                     <div className="flex items-center gap-3 mt-2">
-                      <span className="text-[11px] text-muted-foreground/60 flex items-center gap-1">
+                      <span className="text-[11px] text-muted-foreground/80 flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {formatDate(entry.downloadedAt)}
                       </span>
@@ -259,7 +259,7 @@ export default function History() {
                     <button
                       onClick={() => handleReDownload(entry)}
                       title="Download again"
-                      className="p-2 rounded-xl bg-white/5 hover:bg-primary/20 hover:text-primary text-muted-foreground transition-colors"
+                      className="p-2 rounded-xl bg-white/5 hover:bg-primary/20 hover:text-primary text-muted-foreground dark:text-foreground/85 transition-colors"
                     >
                       <Download className="w-4 h-4" />
                     </button>
@@ -268,14 +268,14 @@ export default function History() {
                       target="_blank"
                       rel="noopener noreferrer"
                       title="Open original"
-                      className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
+                      className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-muted-foreground dark:text-foreground/85 hover:text-foreground transition-colors"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
                     <button
                       onClick={() => handleRemove(entry.id)}
                       title="Remove from history"
-                      className="p-2 rounded-xl bg-white/5 hover:bg-destructive/20 hover:text-destructive text-muted-foreground transition-colors"
+                      className="p-2 rounded-xl bg-white/5 hover:bg-destructive/20 hover:text-destructive text-muted-foreground dark:text-foreground/85 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
