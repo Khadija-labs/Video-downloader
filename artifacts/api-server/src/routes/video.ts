@@ -117,6 +117,7 @@ router.post("/info", async (req, res) => {
     let meta: any;
     try {
       const infoArgs = [
+        "--ignore-config",
         "--dump-json",
         "--no-playlist",
         "--no-warnings",
@@ -298,6 +299,7 @@ router.get("/download", async (req, res) => {
 
     // Build yt-dlp args
     const args = [
+      "--ignore-config",
       "--no-playlist",
       "--no-warnings",
       "--socket-timeout", "30",
