@@ -3,7 +3,7 @@ import { GetVideoInfoBody, GetVideoInfoResponse } from "@workspace/api-zod";
 import { z } from "zod";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { createWriteStream, mkdirSync, existsSync, writeFileSync } from "node:fs";
+import { createWriteStream, mkdirSync, existsSync, writeFileSync, statSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
@@ -39,9 +39,10 @@ const YT_COOKIES_FILE = path.join(DOWNLOAD_DIR, "yt-cookies.txt");
 if (YT_COOKIES_B64) {
   try {
     const decoded = Buffer.from(YT_COOKIES_B64, "base64").toString("utf8");
-    if (decoded.includes("youtube.com") || decoded.includes("# Netscape")) {
-      writeFileSync(YT_COOKIES_FILE, decoded, "utf8");
-    }
+    // Always write cookies content; the file format is validated by yt-dlp.
+    writeFileSync(YT_COOKIES_FILE, decoded, "utf8");
+    const size = statSync(YT_COOKIES_FILE).size;
+    console.log(`YT_COOKIES_FILE ready: ${YT_COOKIES_FILE} (${size} bytes)`);
   } catch (err) {
     console.warn("Failed to decode YT_COOKIES_B64:", err);
   }
@@ -111,7 +112,7 @@ router.post("/info", async (req, res) => {
         "--no-warnings",
         "--socket-timeout", "20",
       ];
-      if (platform === "youtube" && existsSync(YT_COOKIES_FILE)) {
+      if (platform === "youtube" && existsSync(YT_COOKIES_FILE) && statSync(YT_COOKIES_FILE).size > 0) {
         infoArgs.push("--cookies", YT_COOKIES_FILE);
       }
       infoArgs.push(url);
@@ -131,11 +132,24 @@ router.post("/info", async (req, res) => {
           stderr,
         );
 
+      const cookiesInvalid =
+        typeof stderr === "string" &&
+        /cookies.*(invalid|parse|unrecognized)|failed.*cookies/i.test(stderr);
+
       if (ytAuthNeeded) {
         res.status(400).json({
           error:
             "This YouTube link requires sign-in/cookies verification. Please try another public link.",
           code: "YOUTUBE_AUTH_REQUIRED",
+        });
+        return;
+      }
+
+      if (cookiesInvalid) {
+        res.status(400).json({
+          error:
+            "YouTube cookies format is invalid on this server. Re-export cookies.txt and re-check the value in YT_COOKIES_B64.",
+          code: "YOUTUBE_COOKIES_INVALID",
         });
         return;
       }
@@ -269,7 +283,7 @@ router.get("/download", async (req, res) => {
       args.push("--merge-output-format", "mp4");
     }
 
-    if (detectPlatform(url) === "youtube" && existsSync(YT_COOKIES_FILE)) {
+    if (detectPlatform(url) === "youtube" && existsSync(YT_COOKIES_FILE) && statSync(YT_COOKIES_FILE).size > 0) {
       args.push("--cookies", YT_COOKIES_FILE);
     }
     args.push(url);
