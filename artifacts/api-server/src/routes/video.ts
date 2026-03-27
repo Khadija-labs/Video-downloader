@@ -79,6 +79,16 @@ function formatDuration(seconds: number | null | undefined): string {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+function buildYoutubeFallbackArgs(baseArgs: string[]): string[] {
+  return [
+    ...baseArgs,
+    "--extractor-args",
+    "youtube:player_client=android,web",
+    "--extractor-args",
+    "youtube:player_skip=webpage",
+  ];
+}
+
 function buildDownloadUrl(originalUrl: string, formatId: string, filename: string): string {
   return `/api/video/download?url=${encodeURIComponent(originalUrl)}&formatId=${encodeURIComponent(formatId)}&filename=${encodeURIComponent(filename)}`;
 }
@@ -117,8 +127,27 @@ router.post("/info", async (req, res) => {
       }
       infoArgs.push(url);
 
-      const { stdout } = await execFileAsync(YT_DLP, infoArgs, { timeout: 30000 });
-      meta = JSON.parse(stdout);
+      try {
+        const { stdout } = await execFileAsync(YT_DLP, infoArgs, { timeout: 30000 });
+        meta = JSON.parse(stdout);
+      } catch (firstErr: any) {
+        const firstStderr =
+          typeof firstErr?.stderr === "string"
+            ? firstErr.stderr
+            : firstErr?.stderr?.toString?.() || "";
+
+        const shouldRetryYoutube =
+          platform === "youtube" &&
+          /requested format is not available|unable to extract|player response/i.test(
+            firstStderr,
+          );
+
+        if (!shouldRetryYoutube) throw firstErr;
+
+        const retryArgs = buildYoutubeFallbackArgs(infoArgs);
+        const { stdout } = await execFileAsync(YT_DLP, retryArgs, { timeout: 30000 });
+        meta = JSON.parse(stdout);
+      }
     } catch (err: any) {
       const stderr =
         typeof err?.stderr === "string"
