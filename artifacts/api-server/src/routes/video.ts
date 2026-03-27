@@ -6,13 +6,29 @@ import { promisify } from "node:util";
 import { createWriteStream, mkdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { fileURLToPath } from "node:url";
 
 const execFileAsync = promisify(execFile);
 const router: IRouter = Router();
-const YT_DLP =
-  process.env["YT_DLP_PATH"]?.trim() ||
-  process.env["YT_DLP"]?.trim() ||
-  "yt-dlp";
+
+/** Prefer bundled yt-dlp from build (reliable on Render); env overrides. */
+function resolveYtDlpExecutable(): string {
+  const fromEnv =
+    process.env["YT_DLP_PATH"]?.trim() || process.env["YT_DLP"]?.trim();
+  if (fromEnv) return fromEnv;
+
+  const bundleDir = path.dirname(fileURLToPath(import.meta.url));
+  const bundledName = os.platform() === "win32" ? "yt-dlp.exe" : "yt-dlp";
+  const bundled = path.join(bundleDir, bundledName);
+  if (existsSync(bundled)) return bundled;
+
+  const cwdFallback = path.join(process.cwd(), bundledName);
+  if (existsSync(cwdFallback)) return cwdFallback;
+
+  return os.platform() === "win32" ? "yt-dlp.exe" : "yt-dlp";
+}
+
+const YT_DLP = resolveYtDlpExecutable();
 
 // Temp dir for downloads
 const DOWNLOAD_DIR = path.join(os.tmpdir(), "vidsave-downloads");
@@ -85,7 +101,11 @@ router.post("/info", async (req, res) => {
       ], { timeout: 30000 });
       meta = JSON.parse(stdout);
     } catch (err: any) {
-      req.log.error({ err }, "yt-dlp metadata extraction failed");
+      const stderr =
+        typeof err?.stderr === "string"
+          ? err.stderr.slice(0, 800)
+          : err?.stderr?.toString?.()?.slice(0, 800);
+      req.log.error({ err, stderr, ytDlp: YT_DLP }, "yt-dlp metadata extraction failed");
       res.status(400).json({
         error: "Could not fetch video info. The link may be private, expired, or unsupported.",
         code: "EXTRACTION_FAILED",
@@ -244,7 +264,11 @@ router.get("/download", async (req, res) => {
       import("node:fs").then(({ unlink }) => unlink(finalPath, () => {}));
     });
   } catch (err: any) {
-    req.log.error({ err }, "yt-dlp download failed");
+    const stderr =
+      typeof err?.stderr === "string"
+        ? err.stderr.slice(0, 800)
+        : err?.stderr?.toString?.()?.slice(0, 800);
+    req.log.error({ err, stderr, ytDlp: YT_DLP }, "yt-dlp download failed");
     if (!res.headersSent) {
       res.status(500).json({
         error: "Download failed. The video may be restricted or unavailable.",

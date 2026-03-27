@@ -1,14 +1,34 @@
 import { createRequire } from "node:module";
 import path from "node:path";
+import os from "node:os";
 import { fileURLToPath } from "node:url";
 import { build as esbuild } from "esbuild";
 import esbuildPluginPino from "esbuild-plugin-pino";
-import { rm } from "node:fs/promises";
+import { rm, writeFile, chmod } from "node:fs/promises";
 
 // Plugins (e.g. 'esbuild-plugin-pino') may use `require` to resolve dependencies
 globalThis.require = createRequire(import.meta.url);
 
 const artifactDir = path.dirname(fileURLToPath(import.meta.url));
+
+async function downloadYtDlpIntoDist(distDir) {
+  const isWin = os.platform() === "win32";
+  const fileName = isWin ? "yt-dlp.exe" : "yt-dlp";
+  const dest = path.join(distDir, fileName);
+  const url = isWin
+    ? "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe"
+    : "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp";
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`yt-dlp download failed: ${res.status} ${res.statusText}`);
+  }
+  const buf = Buffer.from(await res.arrayBuffer());
+  await writeFile(dest, buf);
+  if (!isWin) {
+    await chmod(dest, 0o755);
+  }
+}
 
 async function buildAll() {
   const distDir = path.resolve(artifactDir, "dist");
@@ -118,6 +138,8 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
     `,
     },
   });
+
+  await downloadYtDlpIntoDist(distDir);
 }
 
 buildAll().catch((err) => {
