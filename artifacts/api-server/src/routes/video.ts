@@ -3,7 +3,7 @@ import { GetVideoInfoBody, GetVideoInfoResponse } from "@workspace/api-zod";
 import { z } from "zod";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { createWriteStream, mkdirSync, existsSync } from "node:fs";
+import { createWriteStream, mkdirSync, existsSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
@@ -33,6 +33,19 @@ const YT_DLP = resolveYtDlpExecutable();
 // Temp dir for downloads
 const DOWNLOAD_DIR = path.join(os.tmpdir(), "vidsave-downloads");
 if (!existsSync(DOWNLOAD_DIR)) mkdirSync(DOWNLOAD_DIR, { recursive: true });
+
+const YT_COOKIES_B64 = process.env["YT_COOKIES_B64"]?.trim();
+const YT_COOKIES_FILE = path.join(DOWNLOAD_DIR, "yt-cookies.txt");
+if (YT_COOKIES_B64) {
+  try {
+    const decoded = Buffer.from(YT_COOKIES_B64, "base64").toString("utf8");
+    if (decoded.includes("youtube.com") || decoded.includes("# Netscape")) {
+      writeFileSync(YT_COOKIES_FILE, decoded, "utf8");
+    }
+  } catch (err) {
+    console.warn("Failed to decode YT_COOKIES_B64:", err);
+  }
+}
 
 function detectPlatform(url: string): string {
   if (/instagram\.com/i.test(url)) return "instagram";
@@ -92,13 +105,18 @@ router.post("/info", async (req, res) => {
     // Use yt-dlp to extract video metadata
     let meta: any;
     try {
-      const { stdout } = await execFileAsync(YT_DLP, [
+      const infoArgs = [
         "--dump-json",
         "--no-playlist",
         "--no-warnings",
         "--socket-timeout", "20",
-        url,
-      ], { timeout: 30000 });
+      ];
+      if (platform === "youtube" && existsSync(YT_COOKIES_FILE)) {
+        infoArgs.push("--cookies", YT_COOKIES_FILE);
+      }
+      infoArgs.push(url);
+
+      const { stdout } = await execFileAsync(YT_DLP, infoArgs, { timeout: 30000 });
       meta = JSON.parse(stdout);
     } catch (err: any) {
       const stderr =
@@ -251,6 +269,9 @@ router.get("/download", async (req, res) => {
       args.push("--merge-output-format", "mp4");
     }
 
+    if (detectPlatform(url) === "youtube" && existsSync(YT_COOKIES_FILE)) {
+      args.push("--cookies", YT_COOKIES_FILE);
+    }
     args.push(url);
 
     await execFileAsync(YT_DLP, args, { timeout: 120000 });
