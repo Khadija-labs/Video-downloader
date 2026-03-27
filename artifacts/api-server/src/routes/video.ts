@@ -106,6 +106,22 @@ router.post("/info", async (req, res) => {
           ? err.stderr.slice(0, 800)
           : err?.stderr?.toString?.()?.slice(0, 800);
       req.log.error({ err, stderr, ytDlp: YT_DLP }, "yt-dlp metadata extraction failed");
+
+      const ytAuthNeeded =
+        typeof stderr === "string" &&
+        /sign in to confirm you're not a bot|cookies-from-browser|pass-cookies-to-yt-dlp/i.test(
+          stderr,
+        );
+
+      if (ytAuthNeeded) {
+        res.status(400).json({
+          error:
+            "This YouTube link requires sign-in/cookies verification. Please try another public link.",
+          code: "YOUTUBE_AUTH_REQUIRED",
+        });
+        return;
+      }
+
       res.status(400).json({
         error: "Could not fetch video info. The link may be private, expired, or unsupported.",
         code: "EXTRACTION_FAILED",

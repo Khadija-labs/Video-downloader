@@ -88,26 +88,31 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-background/60 backdrop-blur-xl">
+    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-32 -left-24 w-[32rem] h-[32rem] rounded-full bg-primary/12 blur-3xl" />
+        <div className="absolute top-20 -right-24 w-[28rem] h-[28rem] rounded-full bg-accent/10 blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/35 to-background/80" />
+      </div>
+      <header className="sticky top-0 z-50 w-full border-b border-[hsl(var(--chrome-border)/0.45)] bg-[hsl(var(--chrome-bg)/0.9)] backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/")}
-              className="flex items-center gap-1.5 text-muted-foreground dark:text-foreground/85 hover:text-foreground transition-colors text-sm"
+              className="flex items-center gap-1.5 text-[hsl(var(--chrome-text)/0.82)] hover:text-[hsl(var(--chrome-text))] transition-colors text-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
             </button>
-            <span className="text-white/40">|</span>
+            <span className="text-[hsl(var(--chrome-text)/0.35)]">|</span>
             <div className="flex items-center gap-2">
               <HistoryIcon className="w-5 h-5 text-primary" />
-              <span className="font-bold text-lg">Download History</span>
+              <span className="font-bold text-lg text-[hsl(var(--chrome-text))]">Download History</span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs text-muted-foreground dark:text-foreground/80 hidden sm:block">
+            <span className="text-xs text-[hsl(var(--chrome-text)/0.75)] hidden sm:block">
               {history.length} {history.length === 1 ? "entry" : "entries"}
             </span>
             {history.length > 0 && (
@@ -116,7 +121,7 @@ export default function HistoryPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   confirmClear
                     ? "bg-destructive/20 text-destructive border border-destructive/30"
-                    : "bg-white/5 hover:bg-white/10 text-muted-foreground dark:text-foreground/85 hover:text-foreground"
+                    : "bg-[hsl(var(--chrome-text)/0.08)] hover:bg-[hsl(var(--chrome-text)/0.14)] text-[hsl(var(--chrome-text)/0.85)] hover:text-[hsl(var(--chrome-text))]"
                 }`}
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -127,16 +132,16 @@ export default function HistoryPage() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+      <main className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {history.length > 0 && (
           <div className="relative mb-6">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground dark:text-foreground/70 pointer-events-none" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/65 pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search history…"
-              className="w-full h-11 pl-11 pr-4 bg-white/5 border border-white/10 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/80 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition"
+              className="w-full h-11 pl-11 pr-4 bg-black/30 border border-white/15 rounded-xl text-sm text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition"
             />
           </div>
         )}
@@ -182,13 +187,13 @@ export default function HistoryPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -40 }}
                   transition={{ delay: i * 0.04 }}
-                  className="group relative flex gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] hover:border-white/10 transition-all duration-200"
+                  className="group relative flex gap-4 p-4 rounded-2xl bg-gradient-to-br from-black/28 to-black/18 border border-white/12 hover:from-black/34 hover:to-black/24 hover:border-white/20 transition-all duration-200"
                 >
                   <div
                     className={`absolute -top-20 -left-20 w-40 h-40 opacity-0 group-hover:opacity-10 blur-3xl rounded-full transition-opacity duration-500 bg-gradient-to-br ${PLATFORM_COLORS[entry.platform] || "from-primary to-accent"}`}
                   />
 
-                  <div className="relative shrink-0 w-24 h-16 sm:w-32 sm:h-20 rounded-xl overflow-hidden bg-white/5">
+                  <div className="relative shrink-0 w-24 h-16 sm:w-32 sm:h-20 rounded-xl overflow-hidden bg-black/30">
                     <img
                       src={entry.thumbnail}
                       alt={entry.title}
@@ -235,7 +240,7 @@ export default function HistoryPage() {
                     <button
                       onClick={() => handleReDownload(entry)}
                       title="Download again"
-                      className="p-2 rounded-xl bg-white/5 hover:bg-primary/20 hover:text-primary text-muted-foreground dark:text-foreground/85 transition-colors"
+                      className="p-2 rounded-xl bg-black/25 hover:bg-primary/20 hover:text-primary text-foreground/80 transition-colors"
                     >
                       <Download className="w-4 h-4" />
                     </button>
@@ -244,14 +249,14 @@ export default function HistoryPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       title="Open original"
-                      className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-muted-foreground dark:text-foreground/85 hover:text-foreground transition-colors"
+                      className="p-2 rounded-xl bg-black/25 hover:bg-black/35 text-foreground/80 hover:text-foreground transition-colors"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
                     <button
                       onClick={() => handleRemove(entry.id)}
                       title="Remove from history"
-                      className="p-2 rounded-xl bg-white/5 hover:bg-destructive/20 hover:text-destructive text-muted-foreground dark:text-foreground/85 transition-colors"
+                      className="p-2 rounded-xl bg-black/25 hover:bg-destructive/20 hover:text-destructive text-foreground/80 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
